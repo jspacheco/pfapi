@@ -1,0 +1,48 @@
+@baseUrl = http://pfapi.dev.pfamosup.org:8865
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwZmFwaS5wZmFtb3N1cC5vcmciLCJzdWIiOiIxIiwidXNlcm5hbWUiOiJwZmNsYWltc2FwcHVzZXIiLCJpYXQiOjE3OTA3NTUyOTMsIm5iZiI6MTc5MDc1NTI5MywiZXhwIjoxNzkwNzU4ODkzLCJqdGkiOiIzMGVjNGMyNDQ2ODllNmY2N2JmYjdkZmRmNmUyMzc3MyJ9.SVRrzoHqmxP_b9pc3QZiqIb2ZwIYJly8W-8o7CQMx40
+
+### Login
+POST {{baseUrl}}/v1/auth_login
+Content-Type: application/json
+
+{
+    "username": "pfclaimsappuser",
+    "apikey": "UVIGJ6OCTLFOKP26CNBQU2WI6HZGDMM2K7C56ET6VLATF4IZPE3Q"
+}
+
+### Search
+POST {{baseUrl}}/v1/search
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "surname": "MARCEL",
+    "givenname": "JO",
+    "pagenum": 1
+}
+
+### SET CLAIM ACTIVITY
+POST {{baseUrl}}/v1/set_claim_activity
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "id_no": "09511063",
+    "claim_ref": "REF21939232332",
+    "status": "",
+    "date_time_stamp": "2026-09-29 15:30:30",
+    "user_id" : 1,
+    "claim_action": "respond" 
+}
+
+### CHECK ELIGIBILITY
+POST {{baseUrl}}/v1/check_eligibility
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "id_no": "09511063",
+    "fund": "JSU",
+    "claim_ref":"REF21939232332",
+    "date_time_stamp": "2026-09-29 15:30:30"
+}
