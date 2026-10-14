@@ -12,6 +12,7 @@ $routes->group('v1', function($routes) {
         $routes->post('search', 'SearchController::search');
         $routes->post('set_claim_activity', 'ClaimController::set_claim_activity');
         $routes->post('check_eligibility', 'ClaimController::check_eligibility');
+        $routes->post('check_forex_rate', 'ClaimController::check_forex_rate');
         
     });
 });

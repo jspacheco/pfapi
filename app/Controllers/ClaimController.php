@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Controllers;
-
+use DateTime;
+use DateInterval;
+use DOMDocument;
+use DOMXPath;
 use App\Models\ApiLogModel;
 use App\Models\SeamanModel;
 use App\Models\ClaimModel;
-
 
 class ClaimController extends BaseApiController
 {
@@ -148,6 +150,76 @@ class ClaimController extends BaseApiController
             ]);            
         }
         
+    }
+
+    public function check_forex_rate()
+    {
+        $username = $this->jwtUser->username;
+        $data = $this->request->getJSON(true);
+
+		$ch = curl_init("https://www.philstar.com/business");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36");
+		// curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; PHP cURL)");
+		$html = curl_exec($ch);
+		curl_close($ch);
+		if (strpos($html, 'challenges.cloudflare.com') === false)
+		{
+            libxml_use_internal_errors(true);
+			$dom = new DOMDocument();
+			$dom->loadHTML('<?xml encoding="UTF-8">'.$html);
+			$xpath = new DOMXPath($dom);
+            libxml_clear_errors();
+
+			// Get the date
+			$dateNode = $xpath->query("//div[@id='forex']/span[@class='lotto_date']");
+			$date = $dateNode->length > 0 ? trim($dateNode->item(0)->textContent) : null;
+
+			// Get the forex rate
+			$rateNode = $xpath->query("//div[@id='forex_body']/p[@class='forex_rate']");
+			$rate = $rateNode->length > 0 ? trim($rateNode->item(0)->textContent) : null;
+
+			// Clean the rate (extract just the number)
+			if ($rate && preg_match('/([0-9]+\.[0-9]+)/', $rate, $matches)) {
+				$rate = $matches[1];
+			}
+			$dtn = DateTime::createFromFormat('M j, Y', $date);
+
+		}
+		else 
+		{ // if blocked by Cloudflare use open.er-api.com
+			$json = file_get_contents('https://open.er-api.com/v6/latest/USD');
+			$fx_data = json_decode($json, true);
+			$rate = $fx_data['rates']['PHP'];
+			$date = $fx_data['time_last_update_unix'];
+			$dtn = DateTime::createFromFormat('U', $date);
+		}
+        $s_state = 'success';
+		$errmsg = '';
+		if ($dtn instanceof DateTime) {
+			$dtfmt = $dtn->format('Y-m-d');
+		} else {
+			$dtfmt = '';
+            $s_state = 'error';
+			$errmsg =  "Invalid or missing date string for forex.";
+		}
+        $a_data = ['date_forex' => $dtfmt
+				    ,'rate' => $rate];
+
+        $logModel = new ApiLogModel();
+        $logModel->insert([
+            'username' => $username,
+            'endpoint' => '/check_forex_rate',
+            'ip_address' => $this->request->getIPAddress(),
+            'request_data' => json_encode($data),
+            'response_count' => count($a_data)
+        ]);           
+
+        return $this->respond([
+            'status' => $s_state,
+            'message' => $errmsg,
+            'a_data' => $a_data
+        ]); 
     }
 
     private function get_allowed_claim_reason($a_reason, $a_fund, $age, $fund_age, $inactive_yrs)

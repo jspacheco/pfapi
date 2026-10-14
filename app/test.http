@@ -1,5 +1,5 @@
 @baseUrl = http://pfapi.dev.pfamosup.org:8865
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwZmFwaS5wZmFtb3N1cC5vcmciLCJzdWIiOiIxIiwidXNlcm5hbWUiOiJwZmNsYWltc2FwcHVzZXIiLCJpYXQiOjE3OTA3NTUyOTMsIm5iZiI6MTc5MDc1NTI5MywiZXhwIjoxNzkwNzU4ODkzLCJqdGkiOiIzMGVjNGMyNDQ2ODllNmY2N2JmYjdkZmRmNmUyMzc3MyJ9.SVRrzoHqmxP_b9pc3QZiqIb2ZwIYJly8W-8o7CQMx40
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwZmFwaS5wZmFtb3N1cC5vcmciLCJzdWIiOiIxIiwidXNlcm5hbWUiOiJwZmNsYWltc2FwcHVzZXIiLCJpYXQiOjE3OTE5NjM1MjYsIm5iZiI6MTc5MTk2MzUyNiwiZXhwIjoxNzkxOTY3MTI2LCJqdGkiOiI3NDEyYzMyODFjOTFjZTc5MjhiZjA4MmQxMjE5Y2I5MSJ9.7_8HCDcVAjlP_TUA8mAPSAC7MPKL68jc0FqVQOrmhvE
 
 ### Login
 POST {{baseUrl}}/v1/auth_login
@@ -45,4 +45,13 @@ Authorization: Bearer {{token}}
     "fund": "JSU",
     "claim_ref":"REF21939232332",
     "date_time_stamp": "2026-09-29 15:30:30"
+}
+
+### CHECK FOREX
+POST {{baseUrl}}/v1/check_forex_rate
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "id_no": "09511063"
 }
